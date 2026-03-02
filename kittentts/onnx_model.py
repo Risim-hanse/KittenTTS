@@ -1,15 +1,11 @@
-from misaki import en, espeak
 import numpy as np
-import phonemizer
-import soundfile as sf
 import onnxruntime as ort
-from .preprocess import TextPreprocessor
+import soundfile as sf
+import re
+import phonemizer
+from misaki import en, espeak
+from .preprocess import TextPreprocessor, normalize_symbol_spacing
 
-def basic_english_tokenize(text):
-    """Basic English tokenizer that splits on whitespace and punctuation."""
-    import re
-    tokens = re.findall(r"\w+|[^\w\s]", text)
-    return tokens
 
 def ensure_punctuation(text):
     """Ensure text ends with punctuation. If not, add a comma."""
@@ -23,7 +19,6 @@ def ensure_punctuation(text):
 
 def chunk_text(text, max_len=400):
     """Split text into chunks for processing long texts."""
-    import re
     
     sentences = re.split(r'[.!?]+', text)
     chunks = []
@@ -52,29 +47,22 @@ def chunk_text(text, max_len=400):
     return chunks
 
 
-class TextCleaner:
-    def __init__(self, dummy=None):
-        _pad = "$"
-        _punctuation = ';:,.!?¡¿—…"«»"" '
-        _letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-        _letters_ipa = "ɑɐɒæɓʙβɔɕçɗɖðʤəɘɚɛɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸθœɶʘɹɺɾɻʀʁɽʂʃʈʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʕʢǀǁǂǃˈˌːˑʼʴʰʱʲʷˠˤ˞↓↑→↗↘'̩'ᵻ"
+class CharTokenizer:
+    PAD = "$"
+    PUNCTUATION = ';:,.!?¡¿—…"«»"" '  # includes space
+    LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    LETTERS_IPA = "ɑɐɒæɓʙβɔɕçɗɖðʤəɘɚɛɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸθœɶʘɹɺɾɻʀʁɽʂʃʈʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʕʢǀǁǂǃˈˌːˑʼʴʰʱʲʷˠˤ˞↓↑→↗↘'̩'ᵻ"
+    
+    def __init__(self, *, skip_unknown: bool = True):
+        self.symbols = list(self.PAD + self.PUNCTUATION + self.LETTERS + self.LETTERS_IPA)
+        self.char2id = {ch: i for i, ch in enumerate(self.symbols)}
+        self.skip_unknown = skip_unknown
 
-        symbols = [_pad] + list(_punctuation) + list(_letters) + list(_letters_ipa)
-        
-        dicts = {}
-        for i in range(len(symbols)):
-            dicts[symbols[i]] = i
-
-        self.word_index_dictionary = dicts
-
-    def __call__(self, text):
-        indexes = []
-        for char in text:
-            try:
-                indexes.append(self.word_index_dictionary[char])
-            except KeyError:
-                pass
-        return indexes
+    def __call__(self, text: str) -> list[int]:
+        if self.skip_unknown:
+            return [i for i in map(self.char2id.get, text) if i is not None]
+        # will raise if any char is missing
+        return [self.char2id[ch] for ch in text]
 
 
 class KittenTTS_1_Onnx:
@@ -92,7 +80,7 @@ class KittenTTS_1_Onnx:
         self.phonemizer = phonemizer.backend.EspeakBackend(
             language="en-us", preserve_punctuation=True, with_stress=True
         )
-        self.text_cleaner = TextCleaner()
+        self.tokenizer = CharTokenizer()
         self.speed_priors = speed_priors
         
         # Available voices
@@ -116,21 +104,15 @@ class KittenTTS_1_Onnx:
         if voice in self.speed_priors:
             speed = speed * self.speed_priors[voice]
         
-        # Phonemize the input text
+        # Preprocess text and convert to phonemes
         phonemes_list = self.phonemizer.phonemize([text])
-        
-        # Process phonemes to get token IDs
-        phonemes = basic_english_tokenize(phonemes_list[0])
-        phonemes = ' '.join(phonemes)
-        tokens = self.text_cleaner(phonemes)
-        
-        # Add start and end tokens
-        tokens.insert(0, 0)
-        tokens.append(10)
-        tokens.append(0)
-        
-        input_ids = np.array([tokens], dtype=np.int64)
-        ref_id =  min(len(text), self.voices[voice].shape[0] - 1)
+        phonemes_str = normalize_symbol_spacing(phonemes_list[0])
+        # Convert phonemes to token IDs
+        token_ids = self.tokenizer(phonemes_str)
+        token_ids = [0, *token_ids, 10, 0]  # add start and end tokens
+
+        input_ids = np.array([token_ids], dtype=np.int64)
+        ref_id = min(len(text), self.voices[voice].shape[0] - 1)
         ref_s = self.voices[voice][ref_id:ref_id+1]
         
         return {

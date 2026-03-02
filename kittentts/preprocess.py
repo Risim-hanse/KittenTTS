@@ -5,7 +5,23 @@ A comprehensive text preprocessing library for NLP pipelines.
 
 import re
 import unicodedata
-from typing import Optional
+from typing import Optional, Literal
+
+_RE_WS = re.compile(r'[\w\s]')
+
+_PUNCT_TABLE = str.maketrans({
+    chr(i): f' {chr(i)} '
+    for i in range(0xD800)
+    if not _RE_WS.match(chr(i))
+} | {
+    chr(i): f' {chr(i)} '
+    for i in range(0xE000, 0x10000)
+    if not _RE_WS.match(chr(i))
+})
+
+def normalize_symbol_spacing(text: str) -> str:
+    """Return a string where punctuation/symbols are space-delimited and whitespace is normalized."""
+    return " ".join(text.translate(_PUNCT_TABLE).split())
 
 
 # ─────────────────────────────────────────────
@@ -655,7 +671,7 @@ def remove_extra_whitespace(text: str) -> str:
     return _RE_SPACES.sub(" ", text).strip()
 
 
-def normalize_unicode(text: str, form: str = "NFC") -> str:
+def normalize_unicode(text: str, form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC") -> str:
     """Normalize unicode characters (NFC, NFD, NFKC, or NFKD)."""
     return unicodedata.normalize(form, text)
 
