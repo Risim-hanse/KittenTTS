@@ -89,6 +89,25 @@ poetry install --only main
 
 (For reproducibility, `uv.lock` is the primary lockfile. Poetry users can generate a `poetry.lock` locally if desired.)
 
+### Alternative setup (Conda + uv pip sync)
+
+If you prefer Conda, use Conda for Python/system libs and let uv install pinned Python packages (from `uv.lock`) directly into the active Conda env.
+
+```
+# create env (mamba recommended; conda also works)
+mamba env create -f environment.yml   # or: conda env create -f environment.yml
+conda activate kittentts-312
+
+# install Python deps (no .venv; installs into the active Conda env)
+uv pip sync --frozen
+
+# run
+python example.py
+```
+
+Notes:
+- On Linux, `libsndfile` (provided by the env) is required for `soundfile`. On macOS/Windows, wheels bundle it.
+- The repo pins Python to 3.12 via `.python-version`; uv respects this across workflows.
 
  ### Basic Usage 
 

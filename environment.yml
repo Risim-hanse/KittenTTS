@@ -1,0 +1,18 @@
+# KittenTTS development environment (Conda + uv pip sync)
+# Usage:
+#   mamba env create -f environment.yml   # or: conda env create -f environment.yml
+#   conda activate kittentts-312
+#   uv pip sync --frozen
+#   python example.py
+#
+# Notes:
+# - libsndfile is needed on Linux for soundfile; on macOS/Windows wheels bundle it (harmless to include).
+# - We intentionally keep Python packages out of this file; uv installs them from uv.lock for reproducibility.
+
+name: kittentts-312
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - libsndfile
