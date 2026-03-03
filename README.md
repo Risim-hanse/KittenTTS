@@ -78,6 +78,16 @@ uv lock
 uv sync
 ```
 
+### Alternative setup (Poetry 2.x)
+
+Poetry 2.x can use the PEP 621 `[project]` metadata in `pyproject.toml`:
+
+```
+poetry check
+poetry install --only main
+```
+
+(For reproducibility, `uv.lock` is the primary lockfile. Poetry users can generate a `poetry.lock` locally if desired.)
 
 
  ### Basic Usage 

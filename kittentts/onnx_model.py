@@ -3,6 +3,8 @@ import onnxruntime as ort
 import soundfile as sf
 import re
 import phonemizer
+import espeakng_loader
+from phonemizer.backend.espeak.wrapper import EspeakWrapper
 from .preprocess import TextPreprocessor, normalize_symbol_spacing
 
 
@@ -75,7 +77,9 @@ class KittenTTS_1_Onnx:
         self.model_path = model_path
         self.voices = np.load(voices_path) 
         self.session = ort.InferenceSession(model_path)
-        
+
+        EspeakWrapper.set_library(espeakng_loader.get_library_path())
+        EspeakWrapper.set_data_path(espeakng_loader.get_data_path())
         self.phonemizer = phonemizer.backend.EspeakBackend(
             language="en-us", preserve_punctuation=True, with_stress=True
         )

@@ -7,8 +7,9 @@ name = "kittentts"
 version = "0.8.1"
 description = "Ultra-lightweight text-to-speech model with just 15 million parameters"
 readme = "README.md"
-requires-python = ">=3.8"
-license = {text = "Apache 2.0"}
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [
     {name = "KittenML"}
 ]
@@ -23,7 +24,7 @@ dependencies = [
     "phonemizer-fork>=3.3.2",
     "onnxruntime",
     "soundfile",
-    "numpy",
+    "numpy>=1.26.4",
     "huggingface_hub",
 ]
 

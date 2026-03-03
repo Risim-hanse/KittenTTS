@@ -3,5 +3,5 @@ espeakng_loader
 phonemizer-fork>=3.3.2
 onnxruntime
 soundfile
-numpy
+numpy>=1.26.4
 huggingface_hub
