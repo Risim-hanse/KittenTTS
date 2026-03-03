@@ -1,28 +1,27 @@
-import soundfile as sf
+#!/usr/bin/env python3
 
+from typing import Literal
+import soundfile as sf
 from kittentts import KittenTTS
 
-# it will run blazing fast on any GPU. But this example will run on CPU.
+Voice = Literal["Bella", "Jasper", "Luna", "Bruno", "Rosie", "Hugo", "Kiki", "Leo"]
+Model = Literal["mini", "micro", "nano"]
 
-# Step 1: Load the model
-# m = KittenTTS("KittenML/kitten-tts-mini-0.8") # 80M version (highest quality)
-m = KittenTTS("KittenML/kitten-tts-micro-0.8") # 40M version (balances speed and quality )
-# m = KittenTTS("KittenML/kitten-tts-nano-0.8") # 15M version (tiny and faster )
+MODELS: dict[Model, str] = {
+    "mini": "KittenML/kitten-tts-mini-0.8",    # 80M — best quality
+    "micro": "KittenML/kitten-tts-micro-0.8",  # 40M — balanced
+    "nano": "KittenML/kitten-tts-nano-0.8",    # 15M — fastest
+}
 
+# Configure here
+model: Model = "micro"
+voice: Voice = "Rosie"
+text: str = "Kittens run and jump. They meow and purr. Happy little cats play."
+output: str = "output.wav"
 
-# Step 2: Generate the audio 
+# Generate and save
+tts = KittenTTS(MODELS[model])
+audio = tts.generate(text=text, voice=voice)
+sf.write(output, audio, 24000)
 
-# this is a sample from the TinyStories dataset. 
-text = "Kittens run and jump. They meow and purr. Happy little cats play."
-
-
-# available_voices : ['Bella', 'Jasper', 'Luna', 'Bruno', 'Rosie', 'Hugo', 'Kiki', 'Leo']
-voice = 'Rosie'
-
-
-
-audio = m.generate(text=text, voice=voice )
-
-# Save the audio
-sf.write('output.wav', audio, 24000)
-print("Audio saved to output.wav")
+print(f"✓ Saved {output}")
