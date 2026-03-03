@@ -1,12 +1,20 @@
 name: uv.lock test matrix
 
 on:
+on:
   push:
     paths:
       - "uv.lock"
+      - "pyproject.toml"
+      - "requirements*.txt"
+      - ".github/workflows/uv-lock-matrix.yml"
   pull_request:
     paths:
       - "uv.lock"
+      - "pyproject.toml"
+      - "requirements*.txt"
+      - ".github/workflows/uv-lock-matrix.yml"
+  workflow_dispatch:
 
 jobs:
   test:
