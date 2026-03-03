@@ -2,7 +2,7 @@ import numpy as np
 import onnxruntime as ort
 import soundfile as sf
 import re
-from misaki.espeak import EspeakG2P
+import phonemizer
 from .preprocess import TextPreprocessor, normalize_symbol_spacing
 
 
@@ -76,7 +76,9 @@ class KittenTTS_1_Onnx:
         self.voices = np.load(voices_path) 
         self.session = ort.InferenceSession(model_path)
         
-        self.g2p = EspeakG2P("en-us")
+        self.phonemizer = phonemizer.backend.EspeakBackend(
+            language="en-us", preserve_punctuation=True, with_stress=True
+        )
         self.tokenizer = CharTokenizer()
         self.speed_priors = speed_priors
         
@@ -102,7 +104,8 @@ class KittenTTS_1_Onnx:
             speed = speed * self.speed_priors[voice]
         
         # Preprocess text and convert to phonemes
-        phonemes_str = normalize_symbol_spacing(self.g2p(text)[0])
+        phonemes_list = self.phonemizer.phonemize([text])
+        phonemes_str = normalize_symbol_spacing(phonemes_list[0])
         # Convert phonemes to token IDs
         token_ids = self.tokenizer(phonemes_str)
         token_ids = [0, *token_ids, 10, 0]  # add start and end tokens

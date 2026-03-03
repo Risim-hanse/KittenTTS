@@ -31,7 +31,6 @@ setup(
     install_requires=[
         "num2words",
         "espeakng_loader",
-        "misaki>=0.9.4",
         "phonemizer-fork>=3.3.2",
         "onnxruntime",
         "soundfile",
