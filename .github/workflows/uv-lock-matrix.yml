@@ -1,7 +1,11 @@
 name: uv.lock test matrix
 
+name: uv.lock test matrix
+
 on:
-on:
+  push:
+    paths:
+      - "uv.lock"
   push:
     paths:
       - "uv.lock"
