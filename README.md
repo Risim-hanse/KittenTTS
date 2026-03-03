@@ -57,6 +57,37 @@ https://github.com/user-attachments/assets/d80120f2-c751-407e-a166-068dd1dd9e8d
 pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl
 ```
 
+### Development setup (uv)
+
+This project is uv-first. To create a local environment and install dependencies:
+
+```
+uv sync
+```
+
+Run the example in the project environment:
+
+```
+uv run python example.py
+```
+
+If you update dependencies in `pyproject.toml`, re-lock and re-sync:
+
+```
+uv lock
+uv sync
+```
+
+### Alternative setup (Poetry 2.x)
+
+Poetry 2.x can use the PEP 621 `[project]` metadata in `pyproject.toml`:
+
+```
+poetry check
+poetry install --only main
+```
+
+(For reproducibility, `uv.lock` is the primary lockfile. Poetry users can generate a `poetry.lock` locally if desired.)
 
 
  ### Basic Usage 
@@ -81,7 +112,7 @@ sf.write('output.wav', audio, 24000)
 
 ## System Requirements
 
-Works literally everywhere. Needs python3.12. We recommend using conda. 
+Python 3.10–3.12 supported (3.12 recommended). We recommend using conda. 
 
 
 
