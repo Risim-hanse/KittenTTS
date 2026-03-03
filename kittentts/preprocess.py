@@ -3,21 +3,25 @@ text_preprocessing.py
 A comprehensive text preprocessing library for NLP pipelines.
 """
 
+from __future__ import annotations
+
 import re
 import unicodedata
 from typing import Optional, Literal
 
 _RE_WS = re.compile(r'[\w\s]')
 
-_PUNCT_TABLE = str.maketrans({
+_PUNCT_TABLE_DICT = {
     chr(i): f' {chr(i)} '
     for i in range(0xD800)
     if not _RE_WS.match(chr(i))
-} | {
+}
+_PUNCT_TABLE_DICT.update({
     chr(i): f' {chr(i)} '
     for i in range(0xE000, 0x10000)
     if not _RE_WS.match(chr(i))
 })
+_PUNCT_TABLE = str.maketrans(_PUNCT_TABLE_DICT)
 
 def normalize_symbol_spacing(text: str) -> str:
     """Return a string where punctuation/symbols are space-delimited and whitespace is normalized."""

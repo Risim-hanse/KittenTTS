@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 from typing import Literal
 import soundfile as sf
 from kittentts import KittenTTS
