@@ -30,9 +30,9 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "num2words",
-        "spacy",
         "espeakng_loader",
-        "misaki[en]>=0.9.4",
+        "misaki>=0.9.4",
+        "phonemizer-fork>=3.3.2",
         "onnxruntime",
         "soundfile",
         "numpy",
