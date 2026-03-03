@@ -112,7 +112,7 @@ sf.write('output.wav', audio, 24000)
 
 ## System Requirements
 
-Works literally everywhere. Needs python3.12. We recommend using conda. 
+Python 3.10–3.12 supported (3.12 recommended). We recommend using conda. 
 
 
 

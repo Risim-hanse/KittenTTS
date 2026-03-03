@@ -7,7 +7,7 @@ name = "kittentts"
 version = "0.8.1"
 description = "Ultra-lightweight text-to-speech model with just 15 million parameters"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10,<3.13"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [
@@ -22,7 +22,8 @@ dependencies = [
     "num2words",
     "espeakng_loader",
     "phonemizer-fork>=3.3.2",
-    "onnxruntime",
+    "onnxruntime>=1.23.2,<1.24.0; python_version < '3.11'",
+    "onnxruntime>=1.24.0; python_version >= '3.11'",
     "soundfile",
     "numpy>=1.26.4",
     "huggingface_hub",
