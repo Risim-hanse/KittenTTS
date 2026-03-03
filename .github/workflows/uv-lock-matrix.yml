@@ -23,7 +23,8 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v3
         with:
-          cache: true
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
@@ -33,3 +34,8 @@ jobs:
 
       - name: Run tests
         run: uv run -p ${{ matrix.python-version }} --no-sync pytest
+
+      - name: Run example
+        run: |
+          uv run -p ${{ matrix.python-version }} --no-sync python example.py
+          rm -f output.wav
