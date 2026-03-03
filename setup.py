@@ -37,7 +37,6 @@ setup(
         "soundfile",
         "numpy",
         "huggingface_hub",
-        "phonemizer",
     ],
     keywords="text-to-speech, tts, speech-synthesis, neural-networks, onnx",
     project_urls={

@@ -1,3 +1,5 @@
+import soundfile as sf
+
 from kittentts import KittenTTS
 
 # it will run blazing fast on any GPU. But this example will run on CPU.
@@ -24,6 +26,5 @@ voice = 'Bruno'
 audio = m.generate(text=text, voice=voice )
 
 # Save the audio
-import soundfile as sf
 sf.write('output.wav', audio, 24000)
-print(f"Audio saved to output.wav")
+print("Audio saved to output.wav")

@@ -26,7 +26,6 @@ dependencies = [
     "soundfile",
     "numpy",
     "huggingface_hub",
-    "phonemizer",
 ]
 
 [project.urls]
