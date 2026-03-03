@@ -7,7 +7,7 @@ name = "kittentts"
 version = "0.8.1"
 description = "Ultra-lightweight text-to-speech model with just 15 million parameters"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10,<3.13"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [
