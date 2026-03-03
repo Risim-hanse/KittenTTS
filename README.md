@@ -57,6 +57,27 @@ https://github.com/user-attachments/assets/d80120f2-c751-407e-a166-068dd1dd9e8d
 pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl
 ```
 
+### Development setup (uv)
+
+This project is uv-first. To create a local environment and install dependencies:
+
+```
+uv sync
+```
+
+Run the example in the project environment:
+
+```
+uv run python example.py
+```
+
+If you update dependencies in `pyproject.toml`, re-lock and re-sync:
+
+```
+uv lock
+uv sync
+```
+
 
 
  ### Basic Usage 

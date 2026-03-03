@@ -26,12 +26,22 @@ dependencies = [
     "soundfile",
     "numpy",
     "huggingface_hub",
+    "phonemizer",
 ]
 
 [project.urls]
 Homepage = "https://github.com/kittenml/kittentts"
 Repository = "https://github.com/kittenml/kittentts"
 Issues = "https://github.com/kittenml/kittentts/issues"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[tool.uv]
+default-groups = ["dev"]
 
 [tool.setuptools.packages.find]
 where = ["."]
