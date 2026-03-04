@@ -15,20 +15,60 @@ on:
       - ".github/workflows/uv-lock-matrix.yml"
   workflow_dispatch:
 
+env:
+  # Consistent, workspace-relative HF hub cache path across all jobs.
+  # HF_HUB_CACHE is the canonical env var — takes priority over HF_HOME.
+  HF_HUB_CACHE: ${{ github.workspace }}/.hf/hub
+  KITTEN_TTS_MODEL: KittenML/kitten-tts-micro-0.8
+
 jobs:
+  prefetch-hf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure HF cache dir exists
+        run: mkdir -p "${HF_HUB_CACHE}"
+
+      - name: Restore HF hub cache
+        id: hf_restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.HF_HUB_CACHE }}
+          key: hf-hub-${{ runner.os }}-${{ hashFiles('scripts/prefetch_kittentts.py') }}
+
+      - name: Install huggingface_hub (bare pip, pinned, 3.8-compatible)
+        if: steps.hf_restore.outputs.cache-hit != 'true'
+        run: pip install "huggingface_hub==0.26.5" # (last release supporting Python 3.8)
+
+      - name: Prefetch model assets
+        if: steps.hf_restore.outputs.cache-hit != 'true'
+        run: python scripts/prefetch_kittentts.py
+
+      - name: Save HF hub cache
+        if: steps.hf_restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.HF_HUB_CACHE }}
+          # Use cache-primary-key from restore so the key is never recomputed.
+          key: ${{ steps.hf_restore.outputs.cache-primary-key }}
+
   test:
+    needs: prefetch-hf
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    env:
+      # No HTTP calls to HF Hub in any matrix job.
+      HF_HUB_OFFLINE: "1"
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -38,6 +78,17 @@ jobs:
 
       - name: Sync (frozen)
         run: uv sync -p ${{ matrix.python-version }} --frozen
+
+      - name: Ensure HF cache dir exists
+        run: mkdir -p "${HF_HUB_CACHE}"
+
+      - name: Restore HF hub cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.HF_HUB_CACHE }}
+          key: hf-hub-${{ runner.os }}-${{ hashFiles('scripts/prefetch_kittentts.py') }}
+          # Hard-fail if cache isn't there — means prefetch-hf broke silently.
+          fail-on-cache-miss: true
 
       - name: Run tests
         run: uv run -p ${{ matrix.python-version }} --no-sync pytest
