@@ -35,8 +35,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ env.HF_HUB_CACHE }}
-          key: hf-hub-${{ runner.os }}-${{ hashFiles('scripts/prefetch_kittentts.py') }}
-
+          key: hf-hub-${{ runner.os }}-${{ env.KITTEN_TTS_MODEL }}-${{ hashFiles('scripts/prefetch_kittentts.py') }}
       - name: Install huggingface_hub (bare pip, pinned, 3.8-compatible)
         if: steps.hf_restore.outputs.cache-hit != 'true'
         run: pip install "huggingface_hub==0.26.5" # (last release supporting Python 3.8)
