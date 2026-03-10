@@ -1,14 +1,15 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "kittentts"
 version = "0.8.1"
 description = "Ultra-lightweight text-to-speech model with just 15 million parameters"
 readme = "README.md"
-requires-python = ">=3.8"
-license = {text = "Apache 2.0"}
+requires-python = ">=3.8,<3.14"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [
     {name = "KittenML"}
 ]
@@ -16,16 +17,27 @@ keywords = ["text-to-speech", "tts", "speech-synthesis", "neural-networks", "onn
 classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Speech",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "num2words",
-    "spacy",
     "espeakng_loader",
-    "misaki[en]>=0.9.4",
-    "onnxruntime",
+    "phonemizer-fork>=3.3.2",
+    "onnxruntime<=1.19.2; python_version < '3.10'",
+    "onnxruntime>=1.23.2,<1.24.0; python_version >= '3.10' and python_version < '3.11'",
+    "onnxruntime>=1.24.0; python_version >= '3.11'",
     "soundfile",
-    "numpy",
-    "huggingface_hub",
+    "numpy>=1.24.4,<2.0; python_version < '3.9'",
+    "numpy>=1.26.4,<2.0; python_version >= '3.9' and python_version < '3.13'",
+    "numpy>=2.1.0; python_version >= '3.13'",
+    "huggingface_hub<1.0.0; python_version < '3.9'",
+    "huggingface_hub; python_version >= '3.9'",
 ]
 
 [project.urls]
@@ -33,9 +45,30 @@ Homepage = "https://github.com/kittenml/kittentts"
 Repository = "https://github.com/kittenml/kittentts"
 Issues = "https://github.com/kittenml/kittentts/issues"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["kittentts*"]
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
 
-[tool.setuptools.package-data]
-kittentts = ["*.json", "*.txt", "*.onnx"]
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["kittentts"]
+include = [
+    "kittentts/*.json",
+    "kittentts/*.txt",
+    "kittentts/*.onnx",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "kittentts/**/*.py",
+    "kittentts/*.json",
+    "kittentts/*.txt",
+    "kittentts/*.onnx",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]

@@ -1,13 +1,17 @@
-from misaki import en, espeak
+import re
 import numpy as np
-import phonemizer
-import soundfile as sf
 import onnxruntime as ort
+import soundfile as sf
+import phonemizer
+import espeakng_loader
+from phonemizer.backend.espeak.wrapper import EspeakWrapper
 from .preprocess import TextPreprocessor
+
+EspeakWrapper.set_library(espeakng_loader.get_library_path())
+EspeakWrapper.set_data_path(espeakng_loader.get_data_path())
 
 def basic_english_tokenize(text):
     """Basic English tokenizer that splits on whitespace and punctuation."""
-    import re
     tokens = re.findall(r"\w+|[^\w\s]", text)
     return tokens
 
@@ -23,7 +27,6 @@ def ensure_punctuation(text):
 
 def chunk_text(text, max_len=400):
     """Split text into chunks for processing long texts."""
-    import re
     
     sentences = re.split(r'[.!?]+', text)
     chunks = []
