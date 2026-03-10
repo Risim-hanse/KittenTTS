@@ -53,19 +53,19 @@ https://github.com/user-attachments/assets/d80120f2-c751-407e-a166-068dd1dd9e8d
 
 ### Installation
 
+Install directly from GitHub:
+```bash
+pip install git+https://github.com/KittenML/KittenTTS.git
 ```
-pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl
-```
+*(Alternatively, you can download the latest `.whl` from the Releases page).*
 
+### Basic Usage 
 
-
- ### Basic Usage 
-
-```
+```python
 from kittentts import KittenTTS
 m = KittenTTS("KittenML/kitten-tts-mini-0.8")
 
-audio = m.generate("This high quality TTS model works without a GPU.", voice='Jasper' )
+audio = m.generate("This high quality TTS model works without a GPU.", voice='Jasper')
 
 # available_voices : ['Bella', 'Jasper', 'Luna', 'Bruno', 'Rosie', 'Hugo', 'Kiki', 'Leo']
 
@@ -81,9 +81,24 @@ sf.write('output.wav', audio, 24000)
 
 ## System Requirements
 
-Works literally everywhere. Needs python3.12. We recommend using conda. 
+Works literally everywhere. Supports **Python 3.8 through 3.13**. 
 
+While standard `pip` or `conda` work fine, we highly recommend using [uv](https://docs.astral.sh/uv/) for lightning-fast, deterministic dependency resolution.
 
+## Development Setup
+
+This project uses modern Python packaging (`hatchling` and `uv`). To contribute, run from source, or build locally:
+
+```bash
+git clone https://github.com/KittenML/KittenTTS.git
+cd KittenTTS
+
+# Creates a venv and installs all dependencies (including dev tools) deterministically
+uv sync  
+
+# To build the package (generates sdist and wheel in /dist)
+uv build
+```
 
 ## Checklist 
 
